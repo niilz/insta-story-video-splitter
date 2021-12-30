@@ -13,16 +13,11 @@ const video = document.querySelector("video");
 const splitButton = document.querySelector("#split-button");
 splitButton.addEventListener("click", splitVideo);
 
-function splitVideo() {
-  start();
-  let data = [];
-}
-
-function start() {
+async function splitVideo() {
   const stream = video.captureStream();
   console.log("stream", stream);
   let data = [];
-  const recorder = new MediaRecorder(stream);
+  const recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
 
   recorder.ondataavailable = (event) => data.push(event.data);
   recorder.start();
@@ -30,32 +25,25 @@ function start() {
   video.play();
   console.log("started video");
 
-  recorder.onstop = (e) => {
+  recorder.onstop = async (e) => {
     console.log("recorder stopped");
-    console.log(data);
   };
 
-  setTimeout(() => recorder.stop(), 1500);
+  const downloadLoop = setInterval(() => download(data), 1500);
+  setTimeout(() => clearInterval(downloadLoop), 3000);
 
-  /*
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: true,
-    })
-    .then((stream) => {
-      preview.srcObject = stream;
-      downloadButton.href = stream;
-      preview.captureStream = preview.captureStream || preview.mozCaptureStream;
-      return new Promise((resolve) => (preview.onplaying = resolve));
-    })
-    .then(() => startRecording(preview.captureStream(), recordingTimeMS))
-    .then((recordedChunks) => {
-      let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
-      recording.src = URL.createObjectURL(recordedBlob);
-      downloadButton.href = recording.src;
-      downloadButton.download = "RecordedVideo.webm";
-    })
-    .catch(log);
-    */
+  recorder.stop();
+}
+
+function download(data) {
+  console.log("data", data);
+
+  const objUrl = URL.createObjectURL(data[0]);
+
+  let downloadable = document.createElement("a");
+  downloadable.href = objUrl;
+  downloadable.download = "test.webm";
+  downloadable.click();
+
+  URL.revokeObjectURL(data[0]);
 }
