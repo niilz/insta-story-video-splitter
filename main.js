@@ -5,6 +5,17 @@ input.addEventListener("input", displayVideo);
 // Split the video when the button is pressed
 const video = document.querySelector("video");
 
+// Display ms from slider
+const lengthSlider = document.querySelector("#length");
+const lenghtDisplay = document.querySelector("#length-display");
+let length = lengthSlider.value;
+const updateLength = (lenString) => {
+  length = lenString;
+  lenghtDisplay.innerHTML = length;
+};
+lengthSlider.addEventListener("change", (e) => updateLength(e.target.value));
+lengthSlider.addEventListener("mousemove", (e) => updateLength(e.target.value));
+
 // Display the uploaded video in the video element
 function displayVideo(e) {
   const videoFile = e.target.files[0];
@@ -34,13 +45,17 @@ const download = (chunk, num) => {
   URL.revokeObjectURL(chunk);
 };
 
+const fifteenSeconds = 1500;
+
 function splitVideo() {
   video.play();
   // muted="true" does not work (no bytes are recorded with muted="true")
   video.volume = 0.1;
   console.log("started video");
   const stream = video.captureStream();
-  console.log("stream", stream);
+
+  const recordingLength = parseInt(length);
+  console.log({ length });
 
   let num = 1;
   // Very first recording
@@ -48,10 +63,15 @@ function splitVideo() {
   // Record the rest (after 15 seconds)
   let recordLoop = setInterval(() => {
     createChunk(num++, stream);
-  }, 1500);
+  }, fifteenSeconds);
 
   // Stop the splitting and recording
-  setTimeout(() => clearInterval(recordLoop), 6000);
+  setTimeout(() => stopSplitting(recordLoop, video), recordingLength);
+}
+
+function stopSplitting(recordLoop, video) {
+  clearInterval(recordLoop);
+  video.pause();
 }
 
 function createChunk(num, stream) {
@@ -60,12 +80,12 @@ function createChunk(num, stream) {
 
   recorder.ondataavailable = (event) => data.push(event.data);
 
-  recorder.start(1500);
+  recorder.start(fifteenSeconds);
   console.log("recorder started");
 
   recorder.onstop = (_e) => {
     download(data[0], num);
   };
 
-  setTimeout(() => recorder.stop(), 1500);
+  setTimeout(() => recorder.stop(), fifteenSeconds);
 }
