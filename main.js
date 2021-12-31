@@ -45,7 +45,7 @@ const download = (chunk, num) => {
   URL.revokeObjectURL(chunk);
 };
 
-const fifteenSeconds = 1500;
+const fifteenSeconds = 15000; //1500;
 
 function splitVideo() {
   video.play();
