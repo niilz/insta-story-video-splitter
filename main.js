@@ -34,7 +34,7 @@ const download = (chunk, num) => {
 
   let downloadable = document.createElement("a");
   downloadable.href = objUrl;
-  const fileName = `test${num++}.mp4`;
+  const fileName = `test${num++}.webm`;
   downloadable.download = fileName;
 
   document.querySelector("body").appendChild(downloadable);
@@ -76,28 +76,9 @@ function stopSplitting(recordLoop, video) {
 
 function createChunk(num, stream) {
   let data = [];
-  var types = [
-    "video/webm",
-    "audio/webm",
-    "video/webm;codecs=vp8",
-    "video/webm;codecs=daala",
-    "video/webm;codecs=h264",
-    "audio/webm;codecs=opus",
-    "video/mpeg",
-    "video/mp4",
-    "video/ogg",
-  ];
-
-  for (var i in types) {
-    let type = document.createElement("div");
-    type.innerHTML =
-      "Is " +
-      types[i] +
-      " supported? " +
-      (MediaRecorder.isTypeSupported(types[i]) ? "Maybe!" : "Nope :(");
-    document.querySelector("body").appendChild(type);
-  }
-  const recorder = new MediaRecorder(stream, { mimeType: "video/ogg" });
+  const recorder = new MediaRecorder(stream, {
+    mimeType: "video/webm;codecs=vp8",
+  });
 
   recorder.ondataavailable = (event) => data.push(event.data);
 
