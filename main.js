@@ -36,6 +36,8 @@ const download = (chunk, num) => {
 
 function splitVideo() {
   video.play();
+  // muted="true" does not work (no bytes are recorded with muted="true")
+  video.volume = 0.1;
   console.log("started video");
   const stream = video.captureStream();
   console.log("stream", stream);
