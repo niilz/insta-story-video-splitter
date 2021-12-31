@@ -25,12 +25,12 @@ function displayVideo(e) {
 const splitButton = document.querySelector("#split-button");
 splitButton.addEventListener("click", splitVideo);
 
-const download = (chunk, num) => {
-  console.log("chnuk download", chunk);
+const download = (blob, num) => {
+  console.log("chnuk download", blob);
 
-  const objUrl = URL.createObjectURL(chunk);
+  const objUrl = URL.createObjectURL(blob);
 
-  console.log({ chunk });
+  console.log({ chunk: blob });
 
   let downloadable = document.createElement("a");
   downloadable.href = objUrl;
@@ -42,7 +42,7 @@ const download = (chunk, num) => {
 
   console.log("donwloadable", downloadable);
 
-  URL.revokeObjectURL(chunk);
+  URL.revokeObjectURL(blob);
 };
 
 const fifteenSeconds = 15000; //1500;
@@ -77,7 +77,7 @@ function stopSplitting(recordLoop, video) {
 function createChunk(num, stream) {
   let data = [];
   const recorder = new MediaRecorder(stream, {
-    mimeType: "video/webm;codecs=vp8",
+    mimeType: "video/webm;codecs=vp9",
   });
 
   recorder.ondataavailable = (event) => data.push(event.data);
@@ -86,7 +86,8 @@ function createChunk(num, stream) {
   console.log("recorder started");
 
   recorder.onstop = (_e) => {
-    download(data[0], num);
+    let blob = new Blob(data, { type: "video/webm" });
+    download(blob, num);
   };
 
   setTimeout(() => recorder.stop(), fifteenSeconds);
