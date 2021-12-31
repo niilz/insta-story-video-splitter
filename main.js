@@ -14,50 +14,56 @@ function displayVideo(e) {
 const splitButton = document.querySelector("#split-button");
 splitButton.addEventListener("click", splitVideo);
 
+const download = (chunk, num) => {
+  console.log("chnuk download", chunk);
+
+  const objUrl = URL.createObjectURL(chunk);
+
+  console.log({ chunk });
+
+  let downloadable = document.createElement("a");
+  downloadable.href = objUrl;
+  const fileName = `test${num++}.webm`;
+  downloadable.download = fileName;
+
+  document.querySelector("body").appendChild(downloadable);
+  downloadable.click();
+
+  console.log("donwloadable", downloadable);
+
+  URL.revokeObjectURL(chunk);
+};
+
 function splitVideo() {
   video.play();
   console.log("started video");
+  const stream = video.captureStream();
+  console.log("stream", stream);
 
-  let i = 1;
+  let num = 1;
+  // Very first recording
+  setTimeout(() => createChunk(num++, stream), 0);
+  // Record the rest (after 15 seconds)
+  let recordLoop = setInterval(() => {
+    createChunk(num++, stream);
+  }, 1500);
 
-  const splitLoop = setInterval(() => {
-    const stream = video.captureStream();
-    console.log("stream", stream);
+  // Stop the splitting and recording
+  setTimeout(() => clearInterval(recordLoop), 6000);
+}
 
-    let data = [];
-    const recorder = new MediaRecorder(stream);
+function createChunk(num, stream) {
+  let data = [];
+  const recorder = new MediaRecorder(stream);
 
-    recorder.ondataavailable = (event) => data.push(event.data);
+  recorder.ondataavailable = (event) => data.push(event.data);
 
-    recorder.start();
-    console.log("recorder started");
+  recorder.start(1500);
+  console.log("recorder started");
 
-    recorder.onstop = (_e) => {
-      download(data, i++);
-    };
-
-    setTimeout(() => recorder.stop(), 3000);
-  }, 3000);
-
-  setTimeout(() => clearInterval(splitLoop), 10000);
-
-  const download = (data, num) => {
-    console.log(num);
-    console.log("data download", data);
-
-    const objUrl = URL.createObjectURL(data[0]);
-
-    let downloadable = document.createElement("a");
-    downloadable.href = objUrl;
-    const fileName = `test${num}.webm`;
-    downloadable.download = fileName;
-
-    document.querySelector("body").appendChild(downloadable);
-    downloadable.innerHTML = fileName;
-    downloadable.click();
-
-    console.log("donwloadable", downloadable);
-
-    URL.revokeObjectURL(data[0]);
+  recorder.onstop = (_e) => {
+    download(data[0], num);
   };
+
+  setTimeout(() => recorder.stop(), 1500);
 }
