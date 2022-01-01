@@ -63,14 +63,12 @@ const createChunk = (num, video, stream) => {
     let blob = new Blob(data, { type: "video/webm" });
     console.log({ data });
     download(blob, num);
-    recording = false;
   };
 
   video.play();
   console.log("started video");
 
-  recorder.start(fifteenSeconds);
-  recording = true;
+  recorder.start();
   console.log("recorder started");
 
   // Stop the splitting and recording
@@ -86,13 +84,5 @@ function splitVideo() {
   const recordingLength = parseInt(length);
   let num = 1;
 
-  let recording = false;
   createChunk(num++, video, stream);
-  /*
-  while (num < 4) {
-    if (!recording) {
-      createChunk(num++, video, stream);
-    }
-  }
-  */
 }
