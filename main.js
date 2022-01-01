@@ -50,7 +50,7 @@ const fifteenSeconds = 15000; //1500;
 const createChunk = (num, video, stream) => {
   let data = [];
   const recorder = new MediaRecorder(stream, {
-    mimeType: "video/webm;codecs=vp8,opus",
+    mimeType: "video/webm;codecs=vp9",
   });
 
   recorder.ondataavailable = (event) => {
