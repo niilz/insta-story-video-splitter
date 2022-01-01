@@ -26,7 +26,7 @@ const splitButton = document.querySelector("#split-button");
 splitButton.addEventListener("click", splitVideo);
 
 const download = (blob, num) => {
-  console.log("chnuk download", blob);
+  console.log("chunk download", blob);
 
   const objUrl = URL.createObjectURL(blob);
 
@@ -47,48 +47,52 @@ const download = (blob, num) => {
 
 const fifteenSeconds = 15000; //1500;
 
-function splitVideo() {
-  video.play();
-  // muted="true" does not work (no bytes are recorded with muted="true")
-  video.volume = 0.1;
-  console.log("started video");
-  const stream = video.captureStream();
-
-  const recordingLength = parseInt(length);
-  console.log({ length });
-
-  let num = 1;
-  // Very first recording
-  setTimeout(() => createChunk(num++, stream), 0);
-  // Record the rest (after 15 seconds)
-  let recordLoop = setInterval(() => {
-    createChunk(num++, stream);
-  }, fifteenSeconds);
-
-  // Stop the splitting and recording
-  setTimeout(() => stopSplitting(recordLoop, video), recordingLength);
-}
-
-function stopSplitting(recordLoop, video) {
-  clearInterval(recordLoop);
-  video.pause();
-}
-
-function createChunk(num, stream) {
+const createChunk = (num, video, stream) => {
   let data = [];
   const recorder = new MediaRecorder(stream, {
     mimeType: "video/webm;codecs=vp9",
   });
 
-  recorder.ondataavailable = (event) => data.push(event.data);
-
-  recorder.start(fifteenSeconds);
-  console.log("recorder started");
-
-  recorder.onstop = (_e) => {
-    let blob = new Blob(data, { type: "video/webm" });
-    download(blob, num);
+  recorder.ondataavailable = (event) => {
+    console.log("data", data);
+    data.push(event.data);
   };
 
+  recorder.onstop = (_e) => {
+    video.pause();
+    let blob = new Blob(data, { type: "video/webm" });
+    console.log({ data });
+    download(blob, num);
+    recording = false;
+  };
+
+  video.play();
+  console.log("started video");
+
+  recorder.start(fifteenSeconds);
+  recording = true;
+  console.log("recorder started");
+
+  // Stop the splitting and recording
   setTimeout(() => recorder.stop(), fifteenSeconds);
+};
+
+function splitVideo() {
+  const stream = video.captureStream();
+
+  // muted="true" does not work (no bytes are recorded with muted="true")
+  video.volume = 0.1;
+
+  const recordingLength = parseInt(length);
+  let num = 1;
+
+  let recording = false;
+  createChunk(num++, video, stream);
+  /*
+  while (num < 4) {
+    if (!recording) {
+      createChunk(num++, video, stream);
+    }
+  }
+  */
 }
