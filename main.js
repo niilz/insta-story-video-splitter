@@ -68,7 +68,7 @@ const createChunk = (num, video, stream) => {
   video.play();
   console.log("started video");
 
-  recorder.start();
+  recorder.start(500);
   console.log("recorder started");
 
   // Stop the splitting and recording
