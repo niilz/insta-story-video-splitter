@@ -38,12 +38,10 @@
       </header>
       <main>
         <input id="video" type="file" />
-        <!-- Todo: read length of video from video. For now allow user input up to 2min -->
-        <input id="length" type="range" min="0" max="120000">enter total length in ms</input>
-        <p id="length-display"></p>
         <button id="split-button">split</button>
         <video controls></video>
         <button id="download-button">download</button>
+        <p id="log-msg"></p>
       </main>
     </div>
     <!-- script src="main.js"></script -->

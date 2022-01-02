@@ -34,19 +34,19 @@ downloadButton.addEventListener("click", download);
 let videoUrl;
 async function splitVideo() {
   await ffmpeg.load();
-  console.log("loaded ffmpeg");
+  log("loaded ffmpeg");
 
   const uploadedFile = input.files[0];
-  console.log("got uploaded file");
+  log("got uploaded file");
 
   const videoFile = await fetchFile(uploadedFile);
-  console.log("fetched File");
+  log("fetched File");
 
   ffmpeg.FS("writeFile", "test", videoFile);
-  console.log("wrote file");
+  log("wrote file");
 
   await ffmpeg.run("-i", "test", "-ss", "0", "-t", "15", "shorter.mp4");
-  console.log("Executed trimming command");
+  log("Executed trimming command");
 
   const videoData = ffmpeg.FS("readFile", "shorter.mp4");
 
@@ -54,4 +54,9 @@ async function splitVideo() {
   const blob = new Blob([videoData.buffer], { type: "video/mp4" });
   videoUrl = URL.createObjectURL(blob);
   video.src = videoUrl;
+}
+
+const logMsg = document.querySelector("#log-msg");
+function log(msg) {
+  logMsg.innerHTML = msg;
 }
