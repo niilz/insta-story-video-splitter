@@ -2,7 +2,7 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 
 const ffmpeg = createFFmpeg({
   log: true,
-  corePath: "/ffmpeg-core/ffmpeg-core.js",
+  corePath: "/public/ffmpeg-core/ffmpeg-core.js",
 });
 
 // Retrieve the uploaded video
